@@ -11,9 +11,9 @@ try:
     while True:
         string = input()
         start = time().real
-        result = sc.raw_convert(string)
+        result = sc.convert(string)
         end = time().real
-        print(f'\t{result} in {end-start} ms')
+        print(f'\t{result} in {(end-start)*1000} ms')
 except EOFError:
     pass
 

@@ -1,4 +1,5 @@
 import re
+from formatter import Formatter
 
 
 def _check_type(arg):
@@ -11,17 +12,12 @@ def _check_type(arg):
     return str(arg)
 
 
-# class DigitSequence:
-#     def __init__(self, value):
-#         self._value = str(value)
-#
-#     def __getitem__(self, item):
-#         i = int(item)
-#         return self._value[-1-i]
-
 class DigitSetConverter:
     def __len__(self):
         return 3
+
+    def __init__(self, formatter=Formatter()):
+        self._formatter = formatter
 
     _zero = '0'
 
@@ -75,7 +71,7 @@ class DigitSetConverter:
             return None
         return dict_for_place.get(digit)
 
-    def raw_convert(self, value):
+    def raw_convert(self, value, _indicator=None):
         assert isinstance(value, str)
         value = value.lstrip(self._zero)
         assert len(value) <= len(self)
@@ -103,8 +99,24 @@ class DigitSetConverter:
                 result.append(specific_place)
                 continue
 
-            result.append(self._digits[digit] + ' ' + self._place_multipliers[place])
+            result.append(self._digits[digit] + self._formatter.space + self._place_multipliers[place])
+        _indicator.should_stick_last_two = not len(result) < len(value)
         return result
 
-    def __call__(self, *args, **kwargs):
-        return self.raw_convert(args[0] if args else kwargs['value'])
+    def convert(self, value):
+        indicator = _FormatIndicator()
+        raw = self.raw_convert(value, _indicator=indicator)
+        if indicator.should_stick_last_two:
+            return self._formatter.stick_last_two(raw)
+        return self._formatter.format(raw)
+
+    def __getzero(self):
+        return self._digits[self._zero]
+
+    zero = property(__getzero)
+
+
+class _FormatIndicator:
+    def __init__(self, should_stick_last_two=True):
+        self.should_stick_last_two = should_stick_last_two
+
