@@ -1,15 +1,4 @@
-import re
 from formatter import Formatter
-
-
-def _check_type(arg):
-    if not isinstance(arg, str) and not isinstance(arg, int):
-        raise TypeError('Argument must be integer or string')
-    if isinstance(arg, str):
-        result = re.search(r'^\d+$', arg)
-        if result is None:
-            raise TypeError('The passed string is not a decimal number.')
-    return str(arg)
 
 
 class DigitSetConverter:
@@ -78,10 +67,6 @@ class DigitSetConverter:
 
         result = []
 
-        # if not value:
-        #     result.append(self._digits[self._zero])
-        #     return result
-
         for place in range(len(value)-1, -1, -1):
 
             digit = value[-1-place]
@@ -100,7 +85,9 @@ class DigitSetConverter:
                 continue
 
             result.append(self._digits[digit] + self._formatter.space + self._place_multipliers[place])
-        _indicator.should_stick_last_two = not len(result) < len(value)
+
+        if _indicator is not None:
+            _indicator.should_stick_last_two = not len(result) < len(value)
         return result
 
     def convert(self, value):

@@ -1,8 +1,20 @@
 from digit_set import DigitSetConverter
 from formatter import Formatter
+import re
 
 
-class SetConnector:
+class NumberToText:
+
+    @staticmethod
+    def _check_type(arg):
+        if not isinstance(arg, str) and not isinstance(arg, int):
+            raise TypeError('Argument must be integer or string')
+        if isinstance(arg, str):
+            result = re.search(r'^\d+$', arg)
+            if result is None:
+                raise TypeError('The passed string is not a decimal number.')
+        return str(arg)
+
     def __init__(self, digit_set_object=DigitSetConverter(), formatter=Formatter()):
         self.digit_set_object = digit_set_object
         self._formatter = formatter
@@ -27,6 +39,8 @@ class SetConnector:
 
     def raw_convert(self, value):
 
+        value = self._check_type(value)
+
         num_length = len(value)
         set_length = len(self.digit_set_object)
         values = [value[max(0, num_length - set_length - i):num_length - i] for i in range(0, num_length, set_length)]
@@ -44,6 +58,8 @@ class SetConnector:
         return result
 
     def half_raw_convert(self, value):
+
+        value = self._check_type(value)
 
         num_length = len(value)
         set_length = len(self.digit_set_object)
